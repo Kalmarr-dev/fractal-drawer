@@ -1,0 +1,8 @@
+[Desktop Entry]
+Version=1.0
+Name=Fractal Drawer
+Exec=/usr/bin/fractal-drawer
+Type=Application
+Path=/usr/bin/
+Terminal=true
+Name[en_US]=Fractal Drawer
