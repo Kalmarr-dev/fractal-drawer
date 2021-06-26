@@ -2,8 +2,8 @@
 // #include "GL/gl.h"
 // #include "GL/freeglut.h"
 #define GLFW_INCLUDE_NONE
-// #include <GLFW/glfw3.h>
-#include "src/glfw/glfw-3.3.2/include/GLFW/glfw3.h"
+#include <GLFW/glfw3.h>
+// #include "src/glfw/glfw-3.3.2/include/GLFW/glfw3.h"
 
 #include "include/linmath/linmath.h"
 
@@ -115,11 +115,14 @@ int main(int argc, char **argv)
 
   Renderer renderer;
 
-  Shader shader("/usr/res/Fractal Drawer/shaders/basic.shader");
+  // Shader shader("/usr/res/Fractal Drawer/shaders/basic.shader");
+  Shader shader("res/shaders/basic.shader");
   shader.Bind();
-  Shader monochromeShader("/usr/res/Fractal Drawer/shaders/monochrome.shader");
+  // Shader monochromeShader("/usr/res/Fractal Drawer/shaders/monochrome.shader");
+  Shader monochromeShader("res/shaders/monochrome.shader");
   monochromeShader.Bind();
-  Shader repeateFractalShader("/usr/res/Fractal Drawer/shaders/repeate_fractal.shader");
+  // Shader repeateFractalShader("/usr/res/Fractal Drawer/shaders/repeate_fractal.shader");
+  Shader repeateFractalShader("res/shaders/repeate_fractal.shader");
 
 
   va.Unbind();

@@ -2,8 +2,8 @@
 
 #include "FractalSkeleton.h"
 
-// #include <GLFW/glfw3.h>
-#include "glfw/glfw-3.3.2/include/GLFW/glfw3.h"
+#include <GLFW/glfw3.h>
+// #include "glfw/glfw-3.3.2/include/GLFW/glfw3.h"
 #include <memory>
 
 struct Input {
