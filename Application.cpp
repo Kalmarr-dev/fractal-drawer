@@ -356,8 +356,6 @@ int main(int argc, char **argv)
     // glfwWaitEvents();
 
     if (Input::fullscreenIsReadyToBeToggled) {
-      // glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
-      // glfwSetWindowShouldClose(window, GL_TRUE);
       GLFWwindow* newWindow;
       if (State::windowIsFullscreen) {
         newWindow = WindowCreator::CreateWindowedWindow(1280, 720, window);
@@ -369,13 +367,9 @@ int main(int argc, char **argv)
       glfwDestroyWindow(window);
       window = newWindow;
       glfwGetWindowSize(window, &windowW, &windowH);
-      // window = glfwCreateWindow(1920, 1080, "Fractal Drawer", glfwGetPrimaryMonitor(), NULL);
-      // glfwMakeContextCurrent(window);
-      // glfwSetMouseButtonCallback(window, Input::MouseButtonCallback);
-      // glfwSetKeyCallback(window, Input::KeyCallback);
-      // glfwSetWindowSizeCallback(window, WindowResizeCallback);
 
       Input::fullscreenIsReadyToBeToggled = false;
+      Input::lastFullscreenToggleTime = std::chrono::high_resolution_clock::now();
     }
 
     if (State::windowWasResized) {

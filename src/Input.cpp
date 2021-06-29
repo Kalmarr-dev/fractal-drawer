@@ -11,6 +11,8 @@ bool Input::fractalsAreReadyToBeDeleted = false;
 bool Input::cameraIsReadyToBeReset = false;
 char Input::predrawnFractalIsReady = 0;
 bool Input::fullscreenIsReadyToBeToggled = false;
+std::chrono::time_point<std::chrono::system_clock> Input::lastFullscreenToggleTime = std::chrono::system_clock::now() - std::chrono::seconds(10);
+
 double Input::cameraZoom = 1;
 
 void Input::MouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {
@@ -142,7 +144,9 @@ void Input::KeyCallback (GLFWwindow* window, int key, int scancode, int action, 
   if (key == GLFW_KEY_3 && action == GLFW_PRESS) {
     predrawnFractalIsReady = 3;
   }
-  if (key == GLFW_KEY_F && action == GLFW_PRESS) {
+  if (key == GLFW_KEY_F && action == GLFW_PRESS
+          && 9999 < std::chrono::duration_cast<std::chrono::milliseconds>(
+          std::chrono::high_resolution_clock::now() - Input::lastFullscreenToggleTime).count()) {
     fullscreenIsReadyToBeToggled = true;
   }
 }
