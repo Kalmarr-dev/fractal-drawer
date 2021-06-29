@@ -2,8 +2,8 @@
 // #include "GL/gl.h"
 // #include "GL/freeglut.h"
 #define GLFW_INCLUDE_NONE
-// #include <GLFW/glfw3.h>
-#include "src/glfw/glfw-3.3.2/include/GLFW/glfw3.h"
+#include <GLFW/glfw3.h>
+// #include "src/glfw/glfw-3.3.2/include/GLFW/glfw3.h"
 
 #include "include/linmath/linmath.h"
 
@@ -29,6 +29,9 @@
 #include "src/FractalSkeleton.h"
 #include "src/Camera.h"
 #include "src/FractalRegion.h"
+#include "src/WindowCreator.h"
+#include "src/WindowResizeCallback.h"
+#include "src/State.h"
 
 #include "src/Shapes/Line.h"
 #include "src/Shapes/Fractal.h"
@@ -54,8 +57,17 @@ int main(int argc, char **argv)
   // glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
   // glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
   // glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+  // glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
+  // glfwWindowHint(GLFW_SCALE_TO_MONITOR, GLFW_TRUE);
+  // glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
+  // glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, GLFW_TRUE); // looks interesting
 
-  window = glfwCreateWindow(960, 960, "Fractal Drawer", NULL, NULL);
+  // int windowW, windowH;
+  // windowW = 1920;
+  // windowH = 1080;
+  // window = glfwCreateWindow(1920, 1080, "Fractal Drawer", glfwGetPrimaryMonitor(), NULL);
+  // window = glfwCreateWindow(windowW, windowH, "Fractal Drawer", glfwGetPrimaryMonitor(), NULL);
+  window = glfwCreateWindow(1280, 720, "Fractal Drawer", NULL, NULL);
 
   if (!window) {
     std::cout << "No GLFW window context, terminating" << '\n';
@@ -66,6 +78,9 @@ int main(int argc, char **argv)
 
   int windowW, windowH;
   glfwGetWindowSize(window, &windowW, &windowH);
+  int fBufferW, fBufferH;
+  glfwGetFramebufferSize(window, &fBufferW, &fBufferH);
+  std::cout << "/* message */ " << windowW << " x " << windowH << " | " << fBufferW << " x " << fBufferH << '\n';
 
   glfwMakeContextCurrent(window);
 
@@ -78,6 +93,7 @@ int main(int argc, char **argv)
 
 
   glfwSwapInterval(1); // limits framerate
+  // glViewport(0, 0, windowW, windowH);
 
 
   std::cout << "OpenGL version: " << glGetString(GL_VERSION) << '\n';
@@ -115,11 +131,14 @@ int main(int argc, char **argv)
 
   Renderer renderer;
 
-  Shader shader("/usr/res/Fractal Drawer/shaders/basic.shader");
+  // Shader shader("/usr/res/Fractal Drawer/shaders/basic.shader");
+  Shader shader("res/shaders/basic.shader");
   shader.Bind();
-  Shader monochromeShader("/usr/res/Fractal Drawer/shaders/monochrome.shader");
+  // Shader monochromeShader("/usr/res/Fractal Drawer/shaders/monochrome.shader");
+  Shader monochromeShader("res/shaders/monochrome.shader");
   monochromeShader.Bind();
-  Shader repeateFractalShader("/usr/res/Fractal Drawer/shaders/repeate_fractal.shader");
+  // Shader repeateFractalShader("/usr/res/Fractal Drawer/shaders/repeate_fractal.shader");
+  Shader repeateFractalShader("res/shaders/repeate_fractal.shader");
 
 
   va.Unbind();
@@ -133,13 +152,15 @@ int main(int argc, char **argv)
   dotSize = 10.0f;
 
   Camera camera;
+  camera.ScaleToMatchScreen(windowW, windowH);
+  Input::currentCamera = &camera;
 
 
   // glfwSetMouseButtonCallback(window, MouseButtonPressCallback);
   glfwSetMouseButtonCallback(window, Input::MouseButtonCallback);
   // glfwSetCursorPosCallback	(window, MouseMoveCallback);
-
   glfwSetKeyCallback(window, Input::KeyCallback);
+  glfwSetWindowSizeCallback(window, WindowResizeCallback);
 
 
   glEnable(GL_POINT_SMOOTH);
@@ -322,17 +343,43 @@ int main(int argc, char **argv)
 
     double mouseX, mouseY;
     glfwGetCursorPos(window, &mouseX, &mouseY);
-    Fractal fractal = Input::currentFractal->GenerateFractalPreview(mouseX / windowW * 2 - 1.0, - mouseY / windowH * 2 + 1.0);
+    Fractal fractal = Input::currentFractal->GenerateFractalPreview(camera.x + camera.w * (mouseX / windowW), camera.y + camera.h * (- mouseY / windowH + 1.0));
     VertexBuffer f_vb(fractal.vertices, 4 * fractal.linesCount * sizeof(float));
     IndexBuffer f_ib(fractal.indices, (unsigned int)fractal.linesCount * 2);
     va.AddBuffer(f_vb, layout);
     renderer.DrawFractalColored(fractal, va, f_ib, monochromeShader, camera, 2.0f, layout);
-    renderer.DrawFractalSkeleton(*(Input::currentFractal), va, shader, layout, 3.0f);
+    renderer.DrawFractalSkeleton(*(Input::currentFractal), va, shader, layout, 3.0f, camera);
 
     /* CHANGE glfwWaitEvents() TO glfwPollEvents() TO REMOVE FREEZES ON ABCENSE OF EVENTS & DECREASE DRAWING ACCURACY */
 
-    // glfwPollEvents();
-    glfwWaitEvents();
+    glfwPollEvents();
+    // glfwWaitEvents();
+
+    if (Input::fullscreenIsReadyToBeToggled) {
+      GLFWwindow* newWindow;
+      if (State::windowIsFullscreen) {
+        newWindow = WindowCreator::CreateWindowedWindow(1280, 720, window);
+        State::windowIsFullscreen = false;
+      } else {
+        newWindow = WindowCreator::CreateFullscreenWindow(1920, 1080, window);
+        State::windowIsFullscreen = true;
+      }
+      glfwDestroyWindow(window);
+      window = newWindow;
+      glfwGetWindowSize(window, &windowW, &windowH);
+
+      Input::fullscreenIsReadyToBeToggled = false;
+      Input::lastFullscreenToggleTime = std::chrono::high_resolution_clock::now();
+    }
+
+    if (State::windowWasResized) {
+      std::cout << State::windowSize.first << " " << State::windowSize.second << '\n';
+      windowW = State::windowSize.first;
+      windowH = State::windowSize.second;
+      camera.ScaleToMatchScreen(windowW, windowH);
+      glViewport(0, 0, windowW, windowH);
+      State::windowWasResized = false;
+    }
 
     if (Input::fractalsAreReadyToBeDeleted) {
       Input::fractalsAreReadyToBeDeleted = false;
@@ -346,6 +393,7 @@ int main(int argc, char **argv)
       Input::cameraIsReadyToBeReset = false;
       camera.x = camera.y = -1.0;
       camera.w = camera.h = 2.0;
+      camera.ScaleToMatchScreen(windowW, windowH);
     }
 
     if (Input::predrawnFractalIsReady > 0) {
@@ -436,8 +484,8 @@ int main(int argc, char **argv)
 
     glfwSwapBuffers(window);
 
-    // glfwPollEvents();
-    glfwWaitEvents();
+    glfwPollEvents();
+    // glfwWaitEvents();
   }
 
 

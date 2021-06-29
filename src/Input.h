@@ -1,10 +1,12 @@
 #pragma once
 
 #include "FractalSkeleton.h"
+#include "Camera.h"
 
-// #include <GLFW/glfw3.h>
-#include "glfw/glfw-3.3.2/include/GLFW/glfw3.h"
+#include <GLFW/glfw3.h>
+// #include "glfw/glfw-3.3.2/include/GLFW/glfw3.h"
 #include <memory>
+#include <chrono>
 
 struct Input {
   static int* keysPressed;
@@ -16,7 +18,10 @@ struct Input {
   static bool fractalsAreReadyToBeDeleted;
   static bool cameraIsReadyToBeReset;
   static char predrawnFractalIsReady;
+  static bool fullscreenIsReadyToBeToggled;
+  static std::chrono::time_point<std::chrono::system_clock> lastFullscreenToggleTime;
 
+  static Camera* currentCamera;
   static double cameraZoom;
 
   static std::unique_ptr<FractalSkeleton> currentFractal;

@@ -1,5 +1,5 @@
 -- fractal export && import
 
--- resize (fullscreen) support
+-- UI
 
--- fractal-skeleton (fractal input) tied to camera, not to global coordinates
+-- three-dotted fractal input, enabling new kind of linear transformation - shear
