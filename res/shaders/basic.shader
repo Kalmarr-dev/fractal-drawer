@@ -3,8 +3,14 @@
 
 layout(location = 0) in vec4 position;
 
+uniform vec4 u_camera;
+
 void main() {
-   gl_Position = position;
+  vec4 newPosition = position;
+  newPosition.xy -= u_camera.xy;
+  newPosition.xy /= u_camera.zw / vec2(2.0, 2.0);
+  newPosition.xy -= vec2(1.0, 1.0);
+  gl_Position = newPosition;
 }
 
 

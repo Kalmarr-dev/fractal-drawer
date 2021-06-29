@@ -75,7 +75,7 @@ void Renderer::DrawLineStrip(const VertexArray& va, const IndexBuffer& ib, const
 // }
 
 
-void Renderer::DrawFractalSkeleton(const FractalSkeleton& fractalSkeleton, VertexArray& va, const Shader& shader, const VertexBufferLayout& layout, const float size) const {
+void Renderer::DrawFractalSkeleton(const FractalSkeleton& fractalSkeleton, VertexArray& va, Shader& shader, const VertexBufferLayout& layout, const float size, const Camera& camera) const {
   std::vector<Line> lines;
   lines.push_back(fractalSkeleton.mainLine);
   for (size_t i = 0; i < fractalSkeleton.baseLines.size(); i++) {
@@ -105,6 +105,8 @@ void Renderer::DrawFractalSkeleton(const FractalSkeleton& fractalSkeleton, Verte
   shader.Bind();
   va.Bind();
   ib.Bind();
+
+  shader.SetUniform4f("u_camera", camera.x, camera.y, camera.w, camera.h);
   glLineWidth(size);
   glDrawElements(GL_LINES, ib.GetCount(), GL_UNSIGNED_INT, nullptr);
 }

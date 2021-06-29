@@ -5,10 +5,12 @@ int Input::keysPressedCount = 0;
 int* Input::mouseKeysPressed = new int[0];
 int Input::mouseKeysPressedCount = 0;
 std::unique_ptr<FractalSkeleton> Input::currentFractal = nullptr;
+Camera* Input::currentCamera = nullptr;
 bool Input::fractalIsReady = false;
 bool Input::fractalsAreReadyToBeDeleted = false;
 bool Input::cameraIsReadyToBeReset = false;
 char Input::predrawnFractalIsReady = 0;
+bool Input::fullscreenIsReadyToBeToggled = false;
 double Input::cameraZoom = 1;
 
 void Input::MouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {
@@ -46,14 +48,14 @@ void Input::MouseButtonCallback(GLFWwindow* window, int button, int action, int 
         double x0, y0, x1, y1;
         x0 = Input::currentFractal->directionLineStart[0];
         y0 = Input::currentFractal->directionLineStart[1];
-        x1 = (  mouseX / windowW - 0.5f) * 2;
-        y1 = (- mouseY / windowW + 0.5f) * 2;
+        x1 = currentCamera->x + currentCamera->w * (  mouseX / windowW);
+        y1 = currentCamera->y + currentCamera->h * (- mouseY / windowH + 1.0f);
         Line line = {x0, y0, x1, y1};
         Input::currentFractal->directionLines.push_back(line);
       } else {
         Input::currentFractal->directionLineIsStarted = true;
-        Input::currentFractal->directionLineStart[0] = (  mouseX / windowW - 0.5f) * 2;
-        Input::currentFractal->directionLineStart[1] = (- mouseY / windowW + 0.5f) * 2;
+        Input::currentFractal->directionLineStart[0] = currentCamera->x + currentCamera->w * (  mouseX / windowW);
+        Input::currentFractal->directionLineStart[1] = currentCamera->y + currentCamera->h * (- mouseY / windowH + 1.0f);
       }
     } else if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
       Input::currentFractal->directionLineIsStarted = false;
@@ -63,14 +65,14 @@ void Input::MouseButtonCallback(GLFWwindow* window, int button, int action, int 
         double x0, y0, x1, y1;
         x0 = Input::currentFractal->mainLineStart[0];
         y0 = Input::currentFractal->mainLineStart[1];
-        x1 = (  mouseX / windowW - 0.5f) * 2;
-        y1 = (- mouseY / windowW + 0.5f) * 2;
+        x1 = currentCamera->x + currentCamera->w * (  mouseX / windowW);
+        y1 = currentCamera->y + currentCamera->h * (- mouseY / windowH + 1.0f);
         Line line = {x0, y0, x1, y1};
         Input::currentFractal->mainLine = line;
       } else {
         Input::currentFractal->mainLineIsStarted = true;
-        Input::currentFractal->mainLineStart[0] = (  mouseX / windowW - 0.5f) * 2;
-        Input::currentFractal->mainLineStart[1] = (- mouseY / windowW + 0.5f) * 2;
+        Input::currentFractal->mainLineStart[0] = currentCamera->x + currentCamera->w * (  mouseX / windowW);
+        Input::currentFractal->mainLineStart[1] = currentCamera->y + currentCamera->h * (- mouseY / windowH + 1.0f);
       }
     } else {
       Input::currentFractal->directionLineIsStarted = false;
@@ -80,14 +82,14 @@ void Input::MouseButtonCallback(GLFWwindow* window, int button, int action, int 
         double x0, y0, x1, y1;
         x0 = Input::currentFractal->baseLineStart[0];
         y0 = Input::currentFractal->baseLineStart[1];
-        x1 = (  mouseX / windowW - 0.5f) * 2;
-        y1 = (- mouseY / windowW + 0.5f) * 2;
+        x1 = currentCamera->x + currentCamera->w * (  mouseX / windowW);
+        y1 = currentCamera->y + currentCamera->h * (- mouseY / windowH + 1.0f);
         Line line = {x0, y0, x1, y1};
         Input::currentFractal->baseLines.push_back(line);
       } else {
         Input::currentFractal->baseLineIsStarted = true;
-        Input::currentFractal->baseLineStart[0] = (  mouseX / windowW - 0.5f) * 2;
-        Input::currentFractal->baseLineStart[1] = (- mouseY / windowW + 0.5f) * 2;
+        Input::currentFractal->baseLineStart[0] = currentCamera->x + currentCamera->w * (  mouseX / windowW);
+        Input::currentFractal->baseLineStart[1] = currentCamera->y + currentCamera->h * (- mouseY / windowH + 1.0f);
       }
     }
   }
@@ -139,6 +141,9 @@ void Input::KeyCallback (GLFWwindow* window, int key, int scancode, int action, 
   }
   if (key == GLFW_KEY_3 && action == GLFW_PRESS) {
     predrawnFractalIsReady = 3;
+  }
+  if (key == GLFW_KEY_F && action == GLFW_PRESS) {
+    fullscreenIsReadyToBeToggled = true;
   }
 }
 
