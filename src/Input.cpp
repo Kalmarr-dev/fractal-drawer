@@ -9,6 +9,7 @@ char Input::predrawnFractalIsReady = 0;
 bool Input::fullscreenIsReadyToBeToggled = false;
 
 double Input::cameraZoom = 1;
+bool Input::cameraZoomLocked = false;
 
 void Input::MouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {
   double mouseX, mouseY;
@@ -84,12 +85,21 @@ void Input::KeyCallback (GLFWwindow* window, int key, int scancode, int action, 
     Input::cameraIsReadyToBeReset = true;
   }
   if (key == GLFW_KEY_Z && action != GLFW_RELEASE) {
-    Input::cameraZoom = 0.995;
-    // Input::cameraZoom = 0.95;
+    if (Input::cameraZoomLocked) {
+      Input::cameraZoom *= 0.995;
+    } else {
+      Input::cameraZoom = 0.995;
+    }
   }
   if (key == GLFW_KEY_X && action != GLFW_RELEASE) {
-    Input::cameraZoom = 1.005555;
-    // Input::cameraZoom = 1.05555;
+    if (Input::cameraZoomLocked) {
+      Input::cameraZoom *= 1.005555;
+    } else {
+      Input::cameraZoom = 1.005555;
+    }
+  }
+  if (key == GLFW_KEY_CAPS_LOCK && action == GLFW_PRESS) {
+    Input::cameraZoomLocked = !Input::cameraZoomLocked;
   }
   if (key == GLFW_KEY_1 && action == GLFW_PRESS) {
     predrawnFractalIsReady = 1;

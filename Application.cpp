@@ -425,7 +425,9 @@ int main(int argc, char **argv)
       cameraWBefore = camera.w;
       camera.ZoomToCoordinates((mouseX / windowW - 0.5) * 2, - (mouseY / windowH - 0.5) * 2, Input::cameraZoom);
       cameraWAfter = camera.w;
-      Input::cameraZoom = 1;
+      if (!Input::cameraZoomLocked) {
+        Input::cameraZoom = 1;
+      }
     }
 
     if (std::floor(std::log(cameraWBefore) / std::log(1.5)) != std::floor(std::log(cameraWAfter) / std::log(1.5))) {
