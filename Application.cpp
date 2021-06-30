@@ -369,7 +369,6 @@ int main(int argc, char **argv)
       glfwGetWindowSize(window, &windowW, &windowH);
 
       Input::fullscreenIsReadyToBeToggled = false;
-      Input::lastFullscreenToggleTime = std::chrono::high_resolution_clock::now();
     }
 
     if (State::windowWasResized) {
@@ -417,9 +416,6 @@ int main(int argc, char **argv)
       Input::predrawnFractalIsReady = 0;
     }
 
-    for (size_t i = 0; i < Input::mouseKeysPressedCount; i++) {
-      std::cout << Input::mouseKeysPressed[i] << '\n';
-    }
 
     double cameraWBefore, cameraWAfter;
 

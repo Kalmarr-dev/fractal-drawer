@@ -1,9 +1,5 @@
 #include "Input.h"
 
-int* Input::keysPressed = new int[0];
-int Input::keysPressedCount = 0;
-int* Input::mouseKeysPressed = new int[0];
-int Input::mouseKeysPressedCount = 0;
 std::unique_ptr<FractalSkeleton> Input::currentFractal = nullptr;
 Camera* Input::currentCamera = nullptr;
 bool Input::fractalIsReady = false;
@@ -11,7 +7,6 @@ bool Input::fractalsAreReadyToBeDeleted = false;
 bool Input::cameraIsReadyToBeReset = false;
 char Input::predrawnFractalIsReady = 0;
 bool Input::fullscreenIsReadyToBeToggled = false;
-std::chrono::time_point<std::chrono::system_clock> Input::lastFullscreenToggleTime = std::chrono::system_clock::now() - std::chrono::seconds(10);
 
 double Input::cameraZoom = 1;
 
@@ -21,25 +16,6 @@ void Input::MouseButtonCallback(GLFWwindow* window, int button, int action, int 
   int windowW, windowH;
   glfwGetWindowSize(window, &windowW, &windowH);
 
-  if (action == GLFW_PRESS) {
-    Input::mouseKeysPressedCount++;
-    int* _mouseKeysPressed = new int[Input::mouseKeysPressedCount];
-    std::copy(Input::mouseKeysPressed, mouseKeysPressed + mouseKeysPressedCount + 1, _mouseKeysPressed);
-    delete[] Input::mouseKeysPressed;
-    Input::mouseKeysPressed = _mouseKeysPressed;
-    Input::mouseKeysPressed[Input::mouseKeysPressedCount - 1] = button;
-  } else if (action == GLFW_RELEASE) {
-    Input::mouseKeysPressedCount--;
-    int* _mouseKeysPressed = new int[Input::mouseKeysPressedCount];
-    int i = 0, j = 0;
-    for ( ; i < Input::mouseKeysPressedCount + 1; i++) {
-      if (Input::mouseKeysPressed[i] == button) continue;
-      _mouseKeysPressed[j] = Input::mouseKeysPressed[i];
-      j++;
-    }
-    delete[] Input::mouseKeysPressed;
-    Input::mouseKeysPressed = _mouseKeysPressed;
-  }
 
   if (action == GLFW_PRESS) {
     if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
@@ -98,26 +74,6 @@ void Input::MouseButtonCallback(GLFWwindow* window, int button, int action, int 
 }
 
 void Input::KeyCallback (GLFWwindow* window, int key, int scancode, int action, int mods) {
-  if (action == GLFW_PRESS) {
-    Input::keysPressedCount++;
-    int* _keysPressed = new int[Input::keysPressedCount];
-    std::copy(Input::keysPressed, keysPressed + keysPressedCount + 1, _keysPressed);
-    delete[] Input::keysPressed;
-    Input::keysPressed = _keysPressed;
-    Input::keysPressed[Input::keysPressedCount - 1] = key;
-  } else if (action == GLFW_RELEASE) {
-    Input::keysPressedCount--;
-    int* _keysPressed = new int[Input::keysPressedCount];
-    int i = 0, j = 0;
-    for ( ; i < Input::keysPressedCount + 1; i++) {
-      if (Input::keysPressed[i] == key) continue;
-      _keysPressed[j] = Input::keysPressed[i];
-      j++;
-    }
-    delete[] Input::keysPressed;
-    Input::keysPressed = _keysPressed;
-  }
-
   if (key == GLFW_KEY_ENTER && action == GLFW_PRESS) {
     Input::fractalIsReady = true;
   }
@@ -144,21 +100,7 @@ void Input::KeyCallback (GLFWwindow* window, int key, int scancode, int action, 
   if (key == GLFW_KEY_3 && action == GLFW_PRESS) {
     predrawnFractalIsReady = 3;
   }
-  if (key == GLFW_KEY_F && action == GLFW_PRESS
-          && 9999 < std::chrono::duration_cast<std::chrono::milliseconds>(
-          std::chrono::high_resolution_clock::now() - Input::lastFullscreenToggleTime).count()) {
+  if (key == GLFW_KEY_F && action == GLFW_PRESS) {
     fullscreenIsReadyToBeToggled = true;
   }
-}
-
-
-
-bool Input::CheckIfMouseKeyIsPressed (int key) {
-  bool result = false;
-  for (size_t i = 0; i < Input::mouseKeysPressedCount; i++) {
-    if (key == Input::mouseKeysPressed[i]) {
-      result = true;
-    }
-  }
-  return result;
 }
