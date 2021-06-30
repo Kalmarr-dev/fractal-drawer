@@ -9,17 +9,11 @@
 #include <chrono>
 
 struct Input {
-  static int* keysPressed;
-  static int keysPressedCount;
-  static int* mouseKeysPressed;
-  static int mouseKeysPressedCount;
-
   static bool fractalIsReady;
   static bool fractalsAreReadyToBeDeleted;
   static bool cameraIsReadyToBeReset;
   static char predrawnFractalIsReady;
   static bool fullscreenIsReadyToBeToggled;
-  static std::chrono::time_point<std::chrono::system_clock> lastFullscreenToggleTime;
 
   static Camera* currentCamera;
   static double cameraZoom;
