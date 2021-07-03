@@ -6,7 +6,6 @@
 #include <GLFW/glfw3.h>
 // #include "glfw/glfw-3.3.2/include/GLFW/glfw3.h"
 #include <memory>
-#include <chrono>
 
 struct Input {
   static bool fractalIsReady;
@@ -17,6 +16,7 @@ struct Input {
 
   static Camera* currentCamera;
   static double cameraZoom;
+  static bool cameraZoomLocked;
 
   static std::unique_ptr<FractalSkeleton> currentFractal;
 
